@@ -51,11 +51,11 @@ st.markdown(
         :root {
           --kpi-bg: #ffffff;
           --kpi-border: #D9D9D9;
-          --kpi-title: #c9c9c9;
+          --kpi-title: #797979;
         }
       }
       .footer-caption {
-        color: #64748B;            /* light-mode color */
+        color: #797979;            /* light-mode color */
         font-size: 0.92rem;
         line-height: 1.7;
         margin-top: 6px;
