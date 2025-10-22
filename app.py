@@ -54,6 +54,15 @@ st.markdown(
           --kpi-title: #c9c9c9;
         }
       }
+      .footer-caption {
+        color: #64748B;            /* light-mode color */
+        font-size: 0.92rem;
+        line-height: 1.7;
+        margin-top: 6px;
+      }
+      @media (prefers-color-scheme: dark) {
+        .footer-caption { color: #A8B3C2; }  /* dark-mode color */
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -348,12 +357,16 @@ with st.expander("See filtered data as a table and download"):
                            use_container_width=True)
 
 # ===================== Notes ================================
-st.caption(
+st.markdown(
     """
-    • Column headers are normalized internally (e.g., `Provider_Code`).  
-    • Bars are ordered by **Rank** (ascending).  
-    • `% Value` uses **2dp** only for the `52+ Weeks` metric; others 1dp.  
-    • Missing values are hidden in charts and shown as `---` in KPIs/table.  
-    • Right-hand panel shows the selected provider’s **Rank across all metrics** in the chosen **Quarter + Domain** (Region ignored).
-    """
+    <div class="footer-caption">
+      • Column headers are normalized internally (e.g., <code>Provider_Code</code>).<br>
+      • Bars are ordered by <b>Rank</b> (ascending).<br>
+      • <code>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.<br>
+      • Missing values are hidden in charts and shown as <code>---</code> in KPIs/table.<br>
+      • Right-hand panel shows the selected provider’s <b>Rank across all metrics</b> in the chosen <b>Quarter + Domain</b>.
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
+
