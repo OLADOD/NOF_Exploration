@@ -15,58 +15,34 @@ import plotly.express as px
 # ===================== Page & Styles =========================
 st.set_page_config(page_title="NHS Provider Metrics", page_icon="📊", layout="wide")
 
-st.markdown(
-    """
-    <style>
-      html, body, [class*="css"]  {
-        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      }
-      .kpi-card {
-        border: 1px solid var(--kpi-border, #e6e6e6);
-        border-radius: 14px;
-        padding: 14px 16px;
-        background: var(--kpi-bg, #ffffff);
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      }
-      .kpi-title { font-size: 0.85rem; color: var(--kpi-title, #555); margin-bottom: 4px; }
-      .kpi-value { font-size: 1.4rem; font-weight: 600; }
+st.markdown("""
+<style>
+.footer-caption,
+.footer-caption * {
+  color: #4B4B4B !important;   /* light-mode color */
+  opacity: 1 !important;       /* kill the faint look */
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.footer-caption ul { margin: 0; padding-left: 1.2rem; }
+.footer-caption code {
+  color: #374151 !important;
+  background: rgba(148,163,184,.15) !important;
+  border-radius: 4px; padding: 0 .25rem;
+}
 
-      /* Metric mini-cards (right panel) */
-      .metric-card {
-        border: 1px solid var(--kpi-border, #e6e6e6);
-        border-radius: 14px;
-        padding: 10px 12px;
-        background: var(--kpi-bg, #ffffff);
-        margin-bottom: 10px;
-      }
-      .metric-title { font-size: 0.9rem; color: var(--kpi-title, #555); margin-bottom: 6px; }
-      .metric-rank { font-size: 1.15rem; font-weight: 600; }
-      .metric-sub { font-size: 0.8rem; color: var(--kpi-title, #666); }
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .footer-caption,
+  .footer-caption * { color: #D1D5DB !important; }
+  .footer-caption code {
+    color: #E5E7EB !important;
+    background: rgba(255,255,255,.08) !important;
+  }
+}
+</style>
+""", unsafe_allow_html=True)
 
-      /* Make the right panel sticky like your sketch */
-      .rhs-sticky { position: sticky; top: 72px; }
-
-      /* Dark-mode friendly (auto via OS/browser) */
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --kpi-bg: #ffffff;
-          --kpi-border: #D9D9D9;
-          --kpi-title: #797979;
-        }
-      }
-      .footer-caption {
-        color: #797979;            /* light-mode color */
-        font-size: 0.92rem;
-        line-height: 1.7;
-        margin-top: 6px;
-      }
-      @media (prefers-color-scheme: dark) {
-        .footer-caption { color: #A8B3C2; }  /* dark-mode color */
-      }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # ===================== Constants =============================
 COLS_ORIG = [
