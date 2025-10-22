@@ -55,25 +55,28 @@ st.markdown(
         }
       }
     
-    .footer-caption,
-    .footer-caption * {
-    color: #4B4B4B !important;   /* light-mode color */
-    opacity: 1 !important;       /* kill the faint look */
+    /* Non-faded footer block */
+    #footer-notes, #footer-notes * {
+    color: #4B4B4B !important;    /* light mode */
+    opacity: 1 !important;        /* kill any inherited fade */
+    }
+    #footer-notes {
     font-size: 0.92rem;
     line-height: 1.7;
+    margin-top: 6px;
     }
-    .footer-caption ul { margin: 0; padding-left: 1.2rem; }
-    .footer-caption code {
+    #footer-notes ul { margin: 0; padding-left: 1.2rem; }
+    #footer-notes code {
     color: #374151 !important;
     background: rgba(148,163,184,.15) !important;
-    border-radius: 4px; padding: 0 .25rem;
+    border-radius: 4px;
+    padding: 0 .25rem;
     }
 
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
-    .footer-caption,
-    .footer-caption * { color: #D1D5DB !important; }
-    .footer-caption code {
+    #footer-notes, #footer-notes * { color: #D1D5DB !important; }
+    #footer-notes code {
         color: #E5E7EB !important;
         background: rgba(255,255,255,.08) !important;
     }
@@ -374,14 +377,17 @@ with st.expander("See filtered data as a table and download"):
 # ===================== Notes ================================
 st.markdown(
     """
-    <div class="footer-caption">
-      • Column headers are normalized internally (e.g., <code>Provider_Code</code>).<br>
-      • Bars are ordered by <b>Rank</b> (ascending).<br>
-      • <code>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.<br>
-      • Missing values are hidden in charts and shown as <code>---</code> in KPIs/table.<br>
-      • Right-hand panel shows the selected provider’s <b>Rank across all metrics</b> in the chosen <b>Quarter + Domain</b>.
+    <div id="footer-notes">
+      <ul>
+        <li>Column headers are normalized internally (e.g., <code>Provider_Code</code>).</li>
+        <li>Bars are ordered by <b>Rank</b> (ascending).</li>
+        <li><code>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.</li>
+        <li>Missing values are hidden in charts and shown as <code>---</code> in KPIs/table.</li>
+        <li>Right-hand panel shows the selected provider’s <b>Rank across all metrics</b> in the chosen <b>Quarter + Domain</b>.</li>
+      </ul>
     </div>
     """,
     unsafe_allow_html=True,
 )
+
 
