@@ -379,7 +379,7 @@ def read_svg(rel_path: str) -> str:
         st.error(f"Logo not found: {path}")
         return ""
 
-logo_svg = Path(r"\\whits\data\redirection\oladod\Documents\Projects\Python\NOF_Exploration\assests\NOF_Logo.svg").read_text(encoding="utf-8")
+logo_svg = Path(r"\\whits\data\redirection\oladod\Documents\Projects\Python\NOF_Exploration\assets\NOF_Logo.svg").read_text(encoding="utf-8")
 
 st.markdown(
     f"""
