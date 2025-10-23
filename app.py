@@ -15,6 +15,26 @@ import plotly.express as px
 # ===================== Page & Styles =========================
 st.set_page_config(page_title="NHS Provider Metrics", page_icon="📊", layout="wide")
 
+st.markdown("""
+<style>
+/* Header layout */
+.app-header{display:flex;align-items:center;gap:10px;margin:0}
+.app-logo svg{height:34px;width:auto;display:block}
+.app-wordmark{font-weight:700;letter-spacing:.2px;color:#111827}
+@media (prefers-color-scheme: dark){
+  .app-wordmark{color:#E5E7EB}
+  /* optional: flip a monochrome logo for dark mode */
+  /* .app-logo svg { filter: brightness(0) invert(1); } */
+}
+
+/* Pull the whole app upward a bit */
+section.main > div.block-container { padding-top: 10px; }   /* default ~2rem */
+
+/* Also trim the context line gap if you use it */
+.context-line{ margin: 4px 0 8px 0 !important; }
+</style>
+""", unsafe_allow_html=True)
+
 st.markdown(
     """
     <style>
@@ -280,7 +300,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+from pathlib import Path
 
+def read_svg(rel_path: str) -> str:
+    """Read an SVG from a path relative to this file. Returns '' if not found/locked."""
+    path = Path(__file__).parent / rel_path
+    try:
+        return path.read_text(encoding="utf-8")
+    except PermissionError:
+        st.error(f"Can’t read logo (permission denied): {path}. Close the file or copy it locally.")
+        return ""
+    except FileNotFoundError:
+        st.error(f"Logo not found: {path}")
+        return ""
+
+logo_svg = Path(r"\\whits\data\redirection\oladod\Documents\Projects\Python\NOF_Exploration\assests\NOF_Logo.svg").read_text(encoding="utf-8")
+
+st.markdown(
+    f"""
+    <div class="app-header" role="banner" aria-label="Header">
+      <div class="app-logo" aria-hidden="true">{logo_svg}</div>
+      <h1 id="page-title">NHS Provider Metrics Dashboard</h1>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ===================== Top KPIs ======================
 
