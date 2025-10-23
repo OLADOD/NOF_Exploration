@@ -11,29 +11,31 @@ import re
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import html  # for safe HTML escaping of metric names
+
 
 # ===================== Page & Styles =========================
 st.set_page_config(page_title="NHS Provider Metrics", page_icon="📊", layout="wide")
 
 st.markdown("""
 <style>
-/* Header layout */
-.app-header{display:flex;align-items:center;gap:10px;margin:0}
-.app-logo svg{height:34px;width:auto;display:block}
-.app-wordmark{font-weight:700;letter-spacing:.2px;color:#111827}
-@media (prefers-color-scheme: dark){
-  .app-wordmark{color:#E5E7EB}
-  /* optional: flip a monochrome logo for dark mode */
-  /* .app-logo svg { filter: brightness(0) invert(1); } */
-}
+/* Tighten the very top padding (works across Streamlit versions) */
+div[data-testid="stAppViewContainer"] > .main > div.block-container { padding-top: 2px !important; }
+section.main > div.block-container { padding-top: 2px !important; }   /* fallback */
+div.block-container { padding-top: 2px !important; }                  /* last resort */
 
-/* Pull the whole app upward a bit */
-section.main > div.block-container { padding-top: 10px; }   /* default ~2rem */
+/* Pull the logo+title row up and trim space beneath it */
+.app-header { margin: -4px 0 4px 0 !important; }  /* negative top nudge + small bottom gap */
+#page-title { margin: 0 !important; line-height: 1.15; }
 
-/* Also trim the context line gap if you use it */
-.context-line{ margin: 4px 0 8px 0 !important; }
+/* Optional: also trim the small context line under the title */
+.context-line{ margin: 2px 0 6px 0 !important; }
+
+/* Optional: slightly reduce Streamlit's built-in top header padding without hiding the menu */
+header[data-testid="stHeader"] { padding-top: 0 !important; padding-bottom: 0 !important; min-height: 34px; }
 </style>
 """, unsafe_allow_html=True)
+
 
 st.markdown(
     """
@@ -74,6 +76,47 @@ st.markdown(
           --kpi-title: #797979;
         }
       }
+      
+     /* Full-width, non-clipped info banner */
+    .info-row { padding: 0 16px; margin-top: 35px; }                 /* create left/right breathing room */
+    .info-banner{
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1E3A8A;
+    padding: 10px 12px;
+    border-radius: 8px;
+    width: 100%;                                 /* stay inside parent width */
+    margin: 16px 0;                               /* no left margin that could clip */
+    box-sizing: border-box;                      /* padding doesn't push width over 100% */
+    }
+      
+     /* --- Right-side vertical metrics panel (always light) --- */
+    .metrics-panel {
+    background: #F8F8F8 !important;     /* light */
+    border: 1px solid #E5E7EB !important;
+    border-radius: 16px;
+    padding: 12px 12px 6px 12px;
+    }
+    .metrics-panel-title {
+    font-size: 1.0rem;
+    font-weight: 400;
+    margin: 0 0 8px 0;
+    color: #505050;
+    }
+    .metric-item { padding: 10px 4px; border-top: 1px solid #E5E7EB; }
+    .metric-item:first-child { border-top: none; }
+    .metric-name { font-size: 0.9rem; color: #7A7A7A; margin-bottom: 4px; }
+    .metric-row  { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 10px; }
+    .metric-rank { font-weight: 600; font-size: 1.35rem; color: #505050; }
+    .metric-pct  { font-size: 1.02rem; color: #374151; }
+
+    /* If anything still becomes a code block, neutralise its look inside the panel */
+    .metrics-panel pre, .metrics-panel code {
+    background: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    }
+    
     </style>
     """,
     unsafe_allow_html=True,
@@ -104,6 +147,8 @@ DEFAULT_PROVIDER_CODE = "RWP"
 
 # Domain order for the Domain select (your custom order)
 DOMAIN_ORDER = {"A&E": 0, "Cancer": 1, "RTT": 2, "Diagnostic": 3}
+
+RHS_PANEL_TITLE = "Ranks across all metrics"  # change anytime
 
 # ===================== Helpers ===============================
 def clean_numeric_str_to_float(x: str):
@@ -190,47 +235,67 @@ def build_chart_plotly(chart_df: pd.DataFrame, chart_title: str):
     )
     return fig
 
-def render_metric_rank_panel(df: pd.DataFrame, provider_code: str | None, selected_quarter: str, selected_domain: str):
-    """Right-hand sticky panel with rank for the selected provider across ALL metrics in Quarter+Domain. Region ignored."""
-    
-    st.subheader("Ranks across all metrics")
+
+def render_metric_rank_panel(
+    df: pd.DataFrame,
+    provider_code: str | None,
+    selected_quarter: str,
+    selected_domain: str,
+    panel_title: str = RHS_PANEL_TITLE,
+):
+    """Right-hand sticky panel with rank for the selected provider across ALL metrics
+    in Quarter+Domain (Region ignored). Rendered as a single vertical column."""
     if not provider_code:
-        st.info("Select a provider to see ranks across all metrics.")
+        st.markdown(
+            (
+                '<div class="metrics-panel">'
+                f'<div class="metrics-panel-title">{html.escape(panel_title)}</div>'
+                '<div class="metric-item"><div class="metric-name">'
+                'Select a provider to see ranks across all metrics.'
+                '</div></div></div>'
+            ),
+            unsafe_allow_html=True,
+        )
         return
 
-    # Slice to Quarter + Domain only (ignore region)
     scope = df[(df[QUARTER] == selected_quarter) & (df[DOMAIN] == selected_domain)].copy()
-
-    # All metrics in this domain+quarter
     metrics_all = sorted(scope[METRIC].dropna().unique().tolist())
 
-    # Build records per metric
     rows = []
     for m in metrics_all:
         r = scope[(scope[METRIC] == m) & (scope[PROV_CODE] == provider_code)]
         if r.empty:
-            rows.append({"Metric": m, "Rank": None, "Percent": None})
+            rank_disp = "---"
+            pct_disp = "---"
         else:
             rr = r.iloc[0]
-            rows.append({"Metric": m, "Rank": rr[RANK], "Percent": rr["Percent"]})
+            rank_disp = "---" if pd.isna(rr[RANK]) else f"{int(rr[RANK]):,}"
+            pct_disp  = format_percent_display(rr["Percent"], rr[METRIC])
 
-    # 2-column grid of mini-cards
-    for i in range(0, len(rows), 2):
-        c1, c2 = st.columns(2)
-        for col, item in zip([c1, c2], rows[i:i+2]):
-            rank_disp = "---" if pd.isna(item["Rank"]) else f"{int(item['Rank']):,}"
-            pct_disp = format_percent_display(item["Percent"], item["Metric"])
-            with col:
-                st.markdown(
-                    f"""
-                    <div class="metric-card">
-                      <div class="metric-title">{item['Metric']}</div>
-                      <div class="metric-rank">{rank_disp}</div>
-                      <div class="metric-sub">{pct_disp}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+        rows.append(
+            '<div class="metric-item">'
+            f'  <div class="metric-name">{html.escape(str(m))}</div>'
+            '  <div class="metric-row">'
+            f'    <div class="metric-rank">{rank_disp}</div>'
+            f'    <div class="metric-pct">{pct_disp}</div>'
+            '  </div>'
+            '</div>'
+        )
+
+    panel_html = (
+        '<div class="metrics-panel">'
+        f'<div class="metrics-panel-title">{html.escape(panel_title)}</div>'
+        + "".join(rows) +
+        '</div>'
+    )
+    st.markdown(panel_html, unsafe_allow_html=True)   # DO NOT use st.write or st.code
+
+
+def info_banner(msg: str):
+    st.markdown(
+        f"<div class='info-row'><div class='info-banner'>{msg}</div></div>",
+        unsafe_allow_html=True,
+    )
 
 # ===================== Sidebar (Upload + Filters) =============
 with st.sidebar:
@@ -241,7 +306,7 @@ with st.sidebar:
     st.header("🔎 Filters")
 
 if uploaded is None:
-    st.info("👈 Upload a CSV in the sidebar to begin.")
+    info_banner("👋 Upload a CSV in the sidebar to begin.")
     st.stop()
 
 # ===================== Load Data ===============================
@@ -376,7 +441,7 @@ if provider_code:
                 render_kpi_card(title, "---")
 
 # ===================== Chart (left) + RHS panel (right) =======
-left, right = st.columns([0.72, 0.28], gap="large")
+left, right = st.columns([0.79, 0.21], gap="large")
 
 with left:
     # Chart data (Region applied; Provider does NOT filter the set)
@@ -396,8 +461,9 @@ with left:
 
 with right:
     st.markdown('<div class="rhs-sticky">', unsafe_allow_html=True)
-    render_metric_rank_panel(df, provider_code, quarter, domain)  # Region ignored here by design
+    render_metric_rank_panel(df, provider_code, quarter, domain, panel_title=RHS_PANEL_TITLE)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ===================== Table (full width) =====================
 with st.expander("See filtered data as a table and download"):
@@ -433,6 +499,7 @@ st.markdown(
         <li><code style='color:#327AD1;background:rgba(193,221,255,.25);border-radius:4px;padding:0 .25rem;'>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.</li>
         <li>Missing values are hidden in charts and shown as <code style='color:#F04141;background:rgba(255,239,193,.85);border-radius:4px;padding:0 .25rem;'>---</code> in KPIs/table.</li>
         <li>Right-hand panel shows the selected provider’s <b>Rank across all metrics</b> in the chosen <b>Quarter + Domain</b>.</li>
+        <p><i>Developed by: David M. Oladoyin</i></p>
       </ul>
     </div>
     """,
