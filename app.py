@@ -386,7 +386,7 @@ st.markdown(
     f"""
     <div class="app-header" role="banner" aria-label="Header">
       <div class="app-logo" aria-hidden="true">{logo_svg}</div>
-      <h1 id="page-title">NHS Provider Metrics Dashboard</h1>
+      <h1 id="page-title">NOF Ranking Dashboard</h1>
     </div>
     """,
     unsafe_allow_html=True,
