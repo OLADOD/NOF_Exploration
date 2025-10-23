@@ -15,7 +15,7 @@ import html  # for safe HTML escaping of metric names
 
 
 # ===================== Page & Styles =========================
-st.set_page_config(page_title="NHS Provider Metrics", page_icon="📊", layout="wide")
+st.set_page_config(page_title="NOF Provider Rankings", page_icon="📊", layout="wide")
 
 st.markdown("""
 <style>
