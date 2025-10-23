@@ -367,19 +367,20 @@ st.markdown("""
 
 from pathlib import Path
 
-def read_svg(rel_path: str) -> str:
-    """Read an SVG from a path relative to this file. Returns '' if not found/locked."""
-    path = Path(__file__).parent / rel_path
+ASSETS_DIR = Path(__file__).parent / "assets"
+LOGO_FILE  = ASSETS_DIR / "NOF_Logo.svg"
+
+def read_svg_file(p: Path) -> str:
     try:
-        return path.read_text(encoding="utf-8")
-    except PermissionError:
-        st.error(f"Can’t read logo (permission denied): {path}. Close the file or copy it locally.")
-        return ""
+        return p.read_text(encoding="utf-8")
     except FileNotFoundError:
-        st.error(f"Logo not found: {path}")
+        st.warning(f"Logo not found at {p}. Rendering title without logo.")
+        return ""
+    except Exception as e:
+        st.warning(f"Could not read logo ({e}).")
         return ""
 
-logo_svg = Path(r"\\whits\data\redirection\oladod\Documents\Projects\Python\NOF_Exploration\assets\NOF_Logo.svg").read_text(encoding="utf-8")
+logo_svg = read_svg_file(LOGO_FILE)
 
 st.markdown(
     f"""
@@ -390,6 +391,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 # ===================== Top KPIs ======================
 
