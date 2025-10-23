@@ -92,23 +92,23 @@ st.markdown(
       
      /* --- Right-side vertical metrics panel (always light) --- */
     .metrics-panel {
-    background: #F8F8F8 !important;     /* light */
-    border: 1px solid #E5E7EB !important;
-    border-radius: 16px;
+    background: #F5FBFB !important;     /* light */
+    border: 1px solid #9CD4D0 !important;
+    border-radius: 14px;
     padding: 12px 12px 6px 12px;
     }
     .metrics-panel-title {
     font-size: 1.0rem;
     font-weight: 400;
     margin: 0 0 8px 0;
-    color: #505050;
+    color: #0C988F;
     }
-    .metric-item { padding: 10px 4px; border-top: 1px solid #E5E7EB; }
+    .metric-item { padding: 10px 4px; border-top: 1px solid #B7E7E4; }
     .metric-item:first-child { border-top: none; }
-    .metric-name { font-size: 0.9rem; color: #7A7A7A; margin-bottom: 4px; }
+    .metric-name { font-size: 0.9rem; color: #48B7AF; margin-bottom: 4px; }
     .metric-row  { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 10px; }
-    .metric-rank { font-weight: 600; font-size: 1.35rem; color: #505050; }
-    .metric-pct  { font-size: 1.02rem; color: #374151; }
+    .metric-rank { font-weight: 600; font-size: 1.35rem; color: #0C988F; }
+    .metric-pct  { font-size: 1.02rem; color: #00A499; }
 
     /* If anything still becomes a code block, neutralise its look inside the panel */
     .metrics-panel pre, .metrics-panel code {
