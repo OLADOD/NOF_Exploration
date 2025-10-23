@@ -54,37 +54,11 @@ st.markdown(
           --kpi-title: #797979;
         }
       }
-    
-    /* Non-faded footer block */
-    #footer-notes, #footer-notes * {
-    color: #4B4B4B !important;    /* light mode */
-    opacity: 1 !important;        /* kill any inherited fade */
-    }
-    #footer-notes {
-    font-size: 0.92rem;
-    line-height: 1.7;
-    margin-top: 6px;
-    }
-    #footer-notes ul { margin: 0; padding-left: 1.2rem; }
-    #footer-notes code {
-    color: #374151 !important;
-    background: rgba(148,163,184,.15) !important;
-    border-radius: 4px;
-    padding: 0 .25rem;
-    }
-
-    /* Dark mode */
-    @media (prefers-color-scheme: dark) {
-    #footer-notes, #footer-notes * { color: #D1D5DB !important; }
-    #footer-notes code {
-        color: #E5E7EB !important;
-        background: rgba(255,255,255,.08) !important;
-    }
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
 
 # ===================== Constants =============================
 COLS_ORIG = [
@@ -198,6 +172,7 @@ def build_chart_plotly(chart_df: pd.DataFrame, chart_title: str):
 
 def render_metric_rank_panel(df: pd.DataFrame, provider_code: str | None, selected_quarter: str, selected_domain: str):
     """Right-hand sticky panel with rank for the selected provider across ALL metrics in Quarter+Domain. Region ignored."""
+    
     st.subheader("Ranks across all metrics")
     if not provider_code:
         st.info("Select a provider to see ranks across all metrics.")
@@ -241,15 +216,6 @@ def render_metric_rank_panel(df: pd.DataFrame, provider_code: str | None, select
 with st.sidebar:
     st.header("📁 Data")
     uploaded = st.file_uploader("Upload the monthly CSV (columns A–L).", type=["csv"], help="Must include: " + ", ".join(COLS_ORIG))
-
-    # sample template
-    example_rows = [
-        {"Quarter":"Q4 (2024/25)","Domain":"A&E","Metric":"4 hours","Region":"London","Provider Code":"RWP","Provider Name":"Royal Wolverhampton NHS Trust","Numerator":"63,290","Denominator":"82,460","% Value":"76.8%","Rank":"36","Months Covered":"3","Covered Months":"Jan, Feb, Mar"},
-        {"Quarter":"Q4 (2024/25)","Domain":"A&E","Metric":"52+ Weeks","Region":"London","Provider Code":"RWP","Provider Name":"Royal Wolverhampton NHS Trust","Numerator":"120","Denominator":"10,000","% Value":"1.20%","Rank":"12","Months Covered":"3","Covered Months":"Jan, Feb, Mar"},
-    ]
-    tmpl_df = pd.DataFrame(example_rows)[COLS_ORIG]
-    st.download_button("Download sample CSV template", data=tmpl_df.to_csv(index=False).encode("utf-8"),
-                       file_name="nhs_metrics_template.csv", mime="text/csv", use_container_width=True)
 
     st.markdown("---")
     st.header("🔎 Filters")
@@ -299,13 +265,46 @@ provider_label = st.sidebar.selectbox(
 )
 provider_code = None if provider_label == "(None)" else extract_code_from_label(provider_label)
 
-# ===================== Header & Top KPIs ======================
-st.title("NHS Provider Metrics Dashboard")
-st.caption(
-    f"Showing **{domain} → {metric}** in **{quarter}**"
-    + (f" for **{region_selected}** region" if region_selected else " across **all regions**")
-    + "."
+# ===================== Header ======================
+
+st.markdown("""
+<style>
+.app-header{display:flex;align-items:center;gap:12px;margin:0 0 6px 0}
+.app-logo svg{height:42px;width:auto;display:block}   /* scale the SVG */
+#page-title{margin:0;line-height:1.2;color:#111827 !important}
+@media (prefers-color-scheme: dark){
+  #page-title{color:#E5E7EB !important}
+  /* If your SVG is single-color and should invert in dark mode, uncomment: */
+  /* .app-logo svg { filter: brightness(0) invert(1); } */
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+
+# ===================== Top KPIs ======================
+
+context_html = (
+    f'Showing <b>{domain}</b> → <b>{metric}</b> in <b>{quarter}</b>'
+    + (f' for <b>{region_selected}</b> region' if region_selected else ' across <b>all regions</b>')
+    + '.'
 )
+st.markdown(
+    f"""
+    <p style="
+        margin:4px 0 10px 0;
+        font-size:0.95rem;
+        line-height:1.6;
+        color:#111827;                /* darker than before */
+        font-weight:500;
+        opacity:1 !important;         /* kill any inherited fade */
+    ">
+      {context_html}
+    </p>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # --- Top KPI row (selected provider only) ---
 if provider_code:
@@ -377,17 +376,21 @@ with st.expander("See filtered data as a table and download"):
 # ===================== Notes ================================
 st.markdown(
     """
-    <div id="footer-notes">
-      <ul>
-        <li>Column headers are normalized internally (e.g., <code>Provider_Code</code>).</li>
+    <div id="footer-notes" style="
+        color:#454545;
+        opacity:1 !important;
+        font-size:0.92rem;
+        line-height:1.7;
+        margin-top:6px;
+    ">
+      <ul style="margin:0; padding-left:1.2rem;">
+        <li>Column headers are normalized internally (e.g., <code style='color:#1AA855;background:rgba(144,204,169,0.26);border-radius:4px;padding:0 .25rem;'>Provider_Code</code>).</li>
         <li>Bars are ordered by <b>Rank</b> (ascending).</li>
-        <li><code>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.</li>
-        <li>Missing values are hidden in charts and shown as <code>---</code> in KPIs/table.</li>
+        <li><code style='color:#327AD1;background:rgba(193,221,255,.25);border-radius:4px;padding:0 .25rem;'>% Value</code> uses 2dp only for <i>52+ Weeks</i>; others 1dp.</li>
+        <li>Missing values are hidden in charts and shown as <code style='color:#F04141;background:rgba(255,239,193,.85);border-radius:4px;padding:0 .25rem;'>---</code> in KPIs/table.</li>
         <li>Right-hand panel shows the selected provider’s <b>Rank across all metrics</b> in the chosen <b>Quarter + Domain</b>.</li>
       </ul>
     </div>
     """,
     unsafe_allow_html=True,
 )
-
-
