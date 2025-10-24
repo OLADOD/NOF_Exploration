@@ -118,29 +118,33 @@ st.markdown(
     }
     
     /* ----------- Context banner: light-blue card with 12px radius */ -----------
-    .context-banner{
-    background: #EFF6FF !important;      /* light blue surface */
-    border: 1px solid #BFDBFE !important; /* subtle outline */
-    color: #1E3A8A !important;            /* readable blue text */
+    #context-banner{
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+
+    background: #EFF6FF !important;        /* light blue */
+    border: 1px solid #BFDBFE !important;   /* subtle outline */
+    color: #1E3A8A !important;              /* readable blue text */
+
     border-radius: 12px;
     padding: 10px 14px;
-    margin: 6px 0 12px;                   /* space above/below */
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);/* tiny elevation */
+    margin: 6px 0 12px;                     /* space above/below */
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
     line-height: 1.55;
     font-size: 0.95rem;
     }
 
     /* Keep inline elements readable */
-    .context-banner b{ color: inherit; }
-    .context-banner code{
+    #context-banner b{ color: inherit; }
+    #context-banner code{
     background: rgba(191,219,254,.25) !important;
     color: #1E3A8A !important;
     border-radius: 4px; padding: 0 .25rem;
     }
 
-    /* Optional: tighten and/or add top spacing if needed */
-    .context-banner--tight { padding: 8px 12px; margin: 4px 0 8px; }
-    .context-banner--spaced { margin-top: 12px; }
+    /* Optional: add extra top spacing if you want */
+    #context-banner.spaced { margin-top: 12px; }
 
     
     </style>
@@ -427,7 +431,7 @@ context_html = (
     + '.'
 )
 st.markdown(
-    f'<div class="context-banner">{context_html}</div>',
+    f'<div id="context-banner">{context_html}</div>',
     unsafe_allow_html=True
 )
 
