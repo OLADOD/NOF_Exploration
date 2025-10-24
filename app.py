@@ -92,8 +92,8 @@ st.markdown(
       
      /* --- Right-side vertical metrics panel (always light) --- */
     .metrics-panel {
-    background: #F5FBFB !important;     /* light */
-    border: 1px solid #9CD4D0 !important;
+    background: #EFFFF2 !important;     /* light */
+    border: 1px solid #C2F3C3 !important;
     border-radius: 14px;
     padding: 12px 12px 6px 12px;
     }
