@@ -119,38 +119,28 @@ st.markdown(
     
     /* ----------- Context banner: light-blue card with 12px radius */ -----------
     .context-banner{
-    background: #EFF6FF;              /* light blue */
-    border: 1px solid #BFDBFE;        /* subtle outline */
+    background: #EFF6FF !important;      /* light blue surface */
+    border: 1px solid #BFDBFE !important; /* subtle outline */
+    color: #1E3A8A !important;            /* readable blue text */
     border-radius: 12px;
     padding: 10px 14px;
-    margin: 6px 0 12px;               /* space above/below */
-    color: #1E3A8A;                   /* readable blue text */
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);  /* minimal elevation */
+    margin: 6px 0 12px;                   /* space above/below */
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);/* tiny elevation */
     line-height: 1.55;
     font-size: 0.95rem;
     }
 
-    /* Keep bold/inline code readable inside */
+    /* Keep inline elements readable */
     .context-banner b{ color: inherit; }
     .context-banner code{
-    background: rgba(191,219,254,.25);
-    border-radius: 4px;
-    padding: 0 .25rem;
-    color: #1E3A8A;
+    background: rgba(191,219,254,.25) !important;
+    color: #1E3A8A !important;
+    border-radius: 4px; padding: 0 .25rem;
     }
 
-    /* Dark mode variant (still blue, just darker) */
-    @media (prefers-color-scheme: dark){
-    .context-banner{
-    background: #102A43;            /* deep blue surface */
-    border-color: #1E3A8A;
-    color: #E6F0FF;
-    }
-    .context-banner code{
-    background: rgba(255,255,255,.08);
-    color: #E6F0FF;
-    }
-    }
+    /* Optional: tighten and/or add top spacing if needed */
+    .context-banner--tight { padding: 8px 12px; margin: 4px 0 8px; }
+    .context-banner--spaced { margin-top: 12px; }
 
     
     </style>
