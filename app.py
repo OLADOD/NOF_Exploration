@@ -148,7 +148,7 @@ DEFAULT_PROVIDER_CODE = "RWP"
 # Domain order for the Domain select (your custom order)
 DOMAIN_ORDER = {"A&E": 0, "Cancer": 1, "RTT": 2, "Diagnostic": 3}
 
-RHS_PANEL_TITLE = "Ranks across all metrics"  # change anytime
+RHS_PANEL_TITLE = "📋Metrics within domain"  # change anytime
 
 # ===================== Helpers ===============================
 def clean_numeric_str_to_float(x: str):
