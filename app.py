@@ -117,7 +117,7 @@ st.markdown(
     font-family: inherit !important;
     }
     
-    /* ----------- Context banner: light-blue card with 12px radius */ -----------
+    /* ----------- Context banner: light-blue card with 12px radius  ----------- */
     #context-banner{
     display: block !important;
     width: 100% !important;
