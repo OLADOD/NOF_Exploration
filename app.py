@@ -77,7 +77,7 @@ st.markdown(
         }
       }
       
-     /* Full-width, non-clipped info banner */
+    /* - - - - - - -  Full-width, non-clipped info banner */
     .info-row { padding: 0 16px; margin-top: 35px; }                 /* create left/right breathing room */
     .info-banner{
     background: #EFF6FF;
@@ -99,7 +99,7 @@ st.markdown(
     }
     .metrics-panel-title {
     font-size: 1.0rem;
-    font-weight: 400;
+    font-weight: 500;
     margin: 0 0 8px 0;
     color: #0C988F;
     }
@@ -116,6 +116,42 @@ st.markdown(
     color: inherit !important;
     font-family: inherit !important;
     }
+    
+    /* ----------- Context banner: light-blue card with 12px radius */ -----------
+    .context-banner{
+    background: #EFF6FF;              /* light blue */
+    border: 1px solid #BFDBFE;        /* subtle outline */
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin: 6px 0 12px;               /* space above/below */
+    color: #1E3A8A;                   /* readable blue text */
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);  /* minimal elevation */
+    line-height: 1.55;
+    font-size: 0.95rem;
+    }
+
+    /* Keep bold/inline code readable inside */
+    .context-banner b{ color: inherit; }
+    .context-banner code{
+    background: rgba(191,219,254,.25);
+    border-radius: 4px;
+    padding: 0 .25rem;
+    color: #1E3A8A;
+    }
+
+    /* Dark mode variant (still blue, just darker) */
+    @media (prefers-color-scheme: dark){
+    .context-banner{
+    background: #102A43;            /* deep blue surface */
+    border-color: #1E3A8A;
+    color: #E6F0FF;
+    }
+    .context-banner code{
+    background: rgba(255,255,255,.08);
+    color: #E6F0FF;
+    }
+    }
+
     
     </style>
     """,
@@ -401,19 +437,10 @@ context_html = (
     + '.'
 )
 st.markdown(
-    f"""
-    <p style="
-        margin:4px 0 10px 0;
-        font-size:0.95rem;
-        line-height:1.6;
-        color:#111827;                /* darker than before */
-        font-weight:500;
-        opacity:1 !important;         /* kill any inherited fade */
-    ">
-      {context_html}
-    </p>
-    """,
-    unsafe_allow_html=True,
+    ('<div class="context-banner">'
+     f'{context_html}'
+     '</div>'),
+    unsafe_allow_html=True
 )
 
 
