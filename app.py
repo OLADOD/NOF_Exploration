@@ -427,9 +427,7 @@ context_html = (
     + '.'
 )
 st.markdown(
-    ('<div class="context-banner">'
-     f'{context_html}'
-     '</div>'),
+    f'<div class="context-banner">{context_html}</div>',
     unsafe_allow_html=True
 )
 
