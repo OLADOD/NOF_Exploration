@@ -90,10 +90,13 @@ st.markdown(
     box-sizing: border-box;                      /* padding doesn't push width over 100% */
     }
       
-     /* --- Right-side vertical metrics panel (always light) --- */
+    /* -------- small vertical gap utilities -------- */
+    .vgap-3 { height: 3px; }
+      
+    /* -------- Right-side vertical metrics panel (always light) --- */
     .metrics-panel {
-    background: #EFFFF2 !important;     /* light */
-    border: 1px solid #C2F3C3 !important;
+    background: #F5FBFB !important;     /* light */
+    border: 1px solid #D0EBE9 !important;
     border-radius: 14px;
     padding: 12px 12px 6px 12px;
     }
@@ -123,9 +126,9 @@ st.markdown(
     width: 100% !important;
     box-sizing: border-box !important;
 
-    background: #EFF6FF !important;        /* light blue */
-    border: 1px solid #BFDBFE !important;   /* subtle outline */
-    color: #1E3A8A !important;              /* readable blue text */
+    background: #EFF9FF !important;        /* light blue */
+    border: 1px solid #BFE6FE !important;   /* subtle outline */
+    color: #0077BF !important;              /* readable blue text */
 
     border-radius: 12px;
     padding: 10px 14px;
@@ -460,6 +463,9 @@ if provider_code:
         for title in ["Rank","Numerator","Denominator","% Value","Covered_Months"]:
             with (c1 if title=="Rank" else c2 if title=="Numerator" else c3 if title=="Denominator" else c4 if title=="% Value" else c5):
                 render_kpi_card(title, "---")
+
+# add 3px vertical space before the chart + metrics panel
+st.markdown('<div class="vgap-3"></div>', unsafe_allow_html=True)
 
 # ===================== Chart (left) + RHS panel (right) =======
 left, right = st.columns([0.79, 0.21], gap="large")
