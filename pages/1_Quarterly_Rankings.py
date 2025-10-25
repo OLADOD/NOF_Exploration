@@ -12,30 +12,30 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import html  # for safe HTML escaping of metric names
+from pathlib import Path
 
 
 # ===================== Page & Styles =========================
-st.set_page_config(page_title="NOF Provider Rankings", page_icon="📊", layout="wide")
+st.set_page_config(
+    page_title="NOF Quarterly Rankings",   # or Monthly
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"       # <— add this
+)
 
-st.markdown("""
-<style>
-/* Tighten the very top padding (works across Streamlit versions) */
-div[data-testid="stAppViewContainer"] > .main > div.block-container { padding-top: 2px !important; }
-section.main > div.block-container { padding-top: 2px !important; }   /* fallback */
-div.block-container { padding-top: 2px !important; }                  /* last resort */
+# ---- Global page CSS (inline; keeps sidebar; pulls content up) ----
 
-/* Pull the logo+title row up and trim space beneath it */
-.app-header { margin: -4px 0 4px 0 !important; }  /* negative top nudge + small bottom gap */
-#page-title { margin: 0 !important; line-height: 1.15; }
+def use_ui_css():
+    p = Path(__file__).parents[1] / "assets" / "ui.css"
+    if p.exists():
+        css = p.read_text(encoding="utf-8")
+        # add a tiny cache-buster comment using mtime so browser applies updates
+        css += f"\n/* mtime:{int(p.stat().st_mtime)} */"
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-/* Optional: also trim the small context line under the title */
-.context-line{ margin: 2px 0 6px 0 !important; }
+use_ui_css()
 
-/* Optional: slightly reduce Streamlit's built-in top header padding without hiding the menu */
-header[data-testid="stHeader"] { padding-top: 0 !important; padding-bottom: 0 !important; min-height: 34px; }
-</style>
-""", unsafe_allow_html=True)
-
+# ===================== Header ======================
 
 st.markdown(
     """
@@ -65,9 +65,6 @@ st.markdown(
       .metric-rank { font-size: 1.15rem; font-weight: 600; }
       .metric-sub { font-size: 0.8rem; color: var(--kpi-title, #666); }
 
-      /* Make the right panel sticky like your sketch */
-      .rhs-sticky { position: sticky; top: 72px; }
-
       /* Dark-mode friendly (auto via OS/browser) */
       @media (prefers-color-scheme: dark) {
         :root {
@@ -77,78 +74,8 @@ st.markdown(
         }
       }
       
-    /* - - - - - - -  Full-width, non-clipped info banner */
-    .info-row { padding: 0 16px; margin-top: 35px; }                 /* create left/right breathing room */
-    .info-banner{
-    background: #EFF6FF;
-    border: 1px solid #BFDBFE;
-    color: #1E3A8A;
-    padding: 10px 12px;
-    border-radius: 8px;
-    width: 100%;                                 /* stay inside parent width */
-    margin: 16px 0;                               /* no left margin that could clip */
-    box-sizing: border-box;                      /* padding doesn't push width over 100% */
-    }
-      
     /* -------- small vertical gap utilities -------- */
     .vgap-3 { height: 3px; }
-      
-    /* -------- Right-side vertical metrics panel (always light) --- */
-    .metrics-panel {
-    background: #F5FBFB !important;     /* light */
-    border: 1px solid #D0EBE9 !important;
-    border-radius: 14px;
-    padding: 12px 12px 6px 12px;
-    }
-    .metrics-panel-title {
-    font-size: 1.0rem;
-    font-weight: 500;
-    margin: 0 0 8px 0;
-    color: #0C988F;
-    }
-    .metric-item { padding: 10px 4px; border-top: 1px solid #B7E7E4; }
-    .metric-item:first-child { border-top: none; }
-    .metric-name { font-size: 0.9rem; color: #48B7AF; margin-bottom: 4px; }
-    .metric-row  { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 10px; }
-    .metric-rank { font-weight: 600; font-size: 1.35rem; color: #0C988F; }
-    .metric-pct  { font-size: 1.02rem; color: #00A499; }
-
-    /* If anything still becomes a code block, neutralise its look inside the panel */
-    .metrics-panel pre, .metrics-panel code {
-    background: transparent !important;
-    color: inherit !important;
-    font-family: inherit !important;
-    }
-    
-    /* ----------- Context banner: light-blue card with 12px radius  ----------- */
-    #context-banner{
-    display: block !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-
-    background: #EFF9FF !important;        /* light blue */
-    border: 1px solid #BFE6FE !important;   /* subtle outline */
-    color: #0077BF !important;              /* readable blue text */
-
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin: 6px 0 12px;                     /* space above/below */
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);
-    line-height: 1.55;
-    font-size: 0.95rem;
-    }
-
-    /* Keep inline elements readable */
-    #context-banner b{ color: inherit; }
-    #context-banner code{
-    background: rgba(191,219,254,.25) !important;
-    color: #1E3A8A !important;
-    border-radius: 4px; padding: 0 .25rem;
-    }
-
-    /* Optional: add extra top spacing if you want */
-    #context-banner.spaced { margin-top: 12px; }
-
     
     </style>
     """,
@@ -302,13 +229,13 @@ def render_metric_rank_panel(
             pct_disp = "---"
         else:
             rr = r.iloc[0]
-            rank_disp = "---" if pd.isna(rr[RANK]) else f"{int(rr[RANK]):,}"
+            rank_disp = "—" if pd.isna(rr[RANK]) else f"{int(rr[RANK])}"
             pct_disp  = format_percent_display(rr["Percent"], rr[METRIC])
 
         rows.append(
             '<div class="metric-item">'
             f'  <div class="metric-name">{html.escape(str(m))}</div>'
-            '  <div class="metric-row">'
+            '  <div class="metric-row two">'
             f'    <div class="metric-rank">{rank_disp}</div>'
             f'    <div class="metric-pct">{pct_disp}</div>'
             '  </div>'
@@ -330,21 +257,57 @@ def info_banner(msg: str):
         unsafe_allow_html=True,
     )
 
+def kpi_card(title: str, value_html: str, delta_html: str | None = None, delta_class: str = "neu"):
+    show_delta = (delta_html is not None) and (str(delta_html).strip() not in {"—", ""})
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+          <div class="kpi-title">{title}</div>
+          <div class="kpi-value">{value_html}</div>
+          {f"<div class='kpi-delta {delta_class}'>{delta_html}</div>" if show_delta else ""}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+def provider_name_from_code(df_scope, code: str) -> str:
+    if not code: return ""
+    s = df_scope.loc[df_scope["Provider_Code"] == code, "Provider_Name"].dropna()
+    return s.iloc[0] if len(s) else ""
+
+
 # ===================== Sidebar (Upload + Filters) =============
 with st.sidebar:
     st.header("📁 Data")
-    uploaded = st.file_uploader("Upload the monthly CSV (columns A–L).", type=["csv"], help="Must include: " + ", ".join(COLS_ORIG))
 
-    st.markdown("---")
-    st.header("🔎 Filters")
+    if "quarterly_bytes" not in st.session_state:
+        up = st.file_uploader(
+            "Upload the quarterly CSV (columns A–L).",
+            type=["csv"],
+            key="quarterly_uploader",
+            help="Upload once — it will persist while this app is open."
+        )
+        if up is not None:
+            st.session_state["quarterly_bytes"] = up.getvalue()
+            st.session_state["quarterly_name"]  = up.name
+            st.rerun()
+    else:
+        st.caption(f"Using: {st.session_state.get('quarterly_name', '(uploaded)')}")
+        if st.button("Clear file", key="clear_quarterly"):
+            st.session_state.pop("quarterly_bytes", None)
+            st.session_state.pop("quarterly_name",  None)
+            st.rerun()
 
-if uploaded is None:
+# Stop if no file is active
+if "quarterly_bytes" not in st.session_state:
     info_banner("👋 Upload a CSV in the sidebar to begin.")
     st.stop()
 
 # ===================== Load Data ===============================
+# load_csv already expects a file-like object; wrap the bytes
 try:
-    df = load_csv(uploaded)
+    import io  # (already imported at top in your file; harmless to re-import)
+    df = load_csv(io.BytesIO(st.session_state["quarterly_bytes"]))
 except Exception as e:
     st.error(f"Failed to read CSV: {e}")
     st.stop()
@@ -383,25 +346,15 @@ provider_label = st.sidebar.selectbox(
 )
 provider_code = None if provider_label == "(None)" else extract_code_from_label(provider_label)
 
-# ===================== Header ======================
 
-st.markdown("""
-<style>
-.app-header{display:flex;align-items:center;gap:12px;margin:0 0 6px 0}
-.app-logo svg{height:42px;width:auto;display:block}   /* scale the SVG */
-#page-title{margin:0;line-height:1.2;color:#111827 !important}
-@media (prefers-color-scheme: dark){
-  #page-title{color:#E5E7EB !important}
-  /* If your SVG is single-color and should invert in dark mode, uncomment: */
-  /* .app-logo svg { filter: brightness(0) invert(1); } */
-}
-</style>
-""", unsafe_allow_html=True)
-
-from pathlib import Path
-
-ASSETS_DIR = Path(__file__).parent / "assets"
-LOGO_FILE  = ASSETS_DIR / "NOF_Logo.svg"
+ROOT_ASSETS  = Path(__file__).parents[1] / "assets"           # project root /assets
+PAGES_ASSETS = Path(__file__).parent / "assets"               # pages/assets (fallback)
+for candidate in (ROOT_ASSETS / "NOF_Logo.svg", PAGES_ASSETS / "NOF_Logo.svg"):
+    if candidate.is_file():
+        LOGO_FILE = candidate
+        break
+else:
+    LOGO_FILE = None
 
 def read_svg_file(p: Path) -> str:
     try:
@@ -413,58 +366,54 @@ def read_svg_file(p: Path) -> str:
         st.warning(f"Could not read logo ({e}).")
         return ""
 
-logo_svg = read_svg_file(LOGO_FILE)
+logo_svg = read_svg_file(LOGO_FILE) if LOGO_FILE else ""
 
 st.markdown(
     f"""
     <div class="app-header" role="banner" aria-label="Header">
       <div class="app-logo" aria-hidden="true">{logo_svg}</div>
-      <h1 id="page-title">NOF Ranking Dashboard</h1>
+      <h1 id="page-title">NOF Quarterly Rankings</h1>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-
-# ===================== Top KPIs ======================
-
+# ===================== Context banner ======================
 context_html = (
     f'Showing <b>{domain}</b> → <b>{metric}</b> in <b>{quarter}</b>'
     + (f' for <b>{region_selected}</b> region' if region_selected else ' across <b>all regions</b>')
     + '.'
 )
-st.markdown(
-    f'<div id="context-banner">{context_html}</div>',
-    unsafe_allow_html=True
-)
+st.markdown(f'<div id="context-banner">{context_html}</div>', unsafe_allow_html=True)
 
+# ===================== Provider heading ====================
+if provider_code:
+    prov_name = provider_name_from_code(df_qdmr, provider_code)
+    st.markdown(f"<h2 class='kpi-heading'>{provider_code} — {prov_name}</h2>", unsafe_allow_html=True)
+else:
+    st.info("Select a provider to see KPIs and trend.")
 
-# --- Top KPI row (selected provider only) ---
+# ===================== KPI cards (no deltas on Quarterly) ===
 if provider_code:
     row = df_qdmr.loc[df_qdmr[PROV_CODE] == provider_code]
     if not row.empty:
         r = row.iloc[0]
-        rank_disp = "---" if pd.isna(r[RANK]) else f"{int(r[RANK]):,}"
-        num_disp  = "---" if pd.isna(r[NUM])  else f"{int(r[NUM]):,}"
-        den_disp  = "---" if pd.isna(r[DEN])  else f"{int(r[DEN]):,}"
+        rank_disp = "—" if pd.isna(r[RANK]) else f"{int(r[RANK]):,}"
+        num_disp  = "—" if pd.isna(r[NUM])  else f"{int(r[NUM]):,}"
+        den_disp  = "—" if pd.isna(r[DEN])  else f"{int(r[DEN]):,}"
         pct_disp  = format_percent_display(r["Percent"], r[METRIC])
-        cov_disp  = r[COVERED_MONTHS] if isinstance(r[COVERED_MONTHS], str) and r[COVERED_MONTHS].strip() else "---"
+        cov_disp  = r[COVERED_MONTHS].strip() if isinstance(r[COVERED_MONTHS], str) and r[COVERED_MONTHS].strip() else "—"
 
-        st.subheader(f"KPI — {provider_code} · {r[PROV_NAME]}")
         c1, c2, c3, c4, c5 = st.columns(5)
-        with c1: render_kpi_card("Rank", rank_disp)
-        with c2: render_kpi_card("Numerator", num_disp)
-        with c3: render_kpi_card("Denominator", den_disp)
-        with c4: render_kpi_card("% Value", pct_disp)
-        with c5: render_kpi_card("Covered_Months", cov_disp)
+        with c1: kpi_card("Rank", rank_disp)
+        with c2: kpi_card("Numerator", num_disp)
+        with c3: kpi_card("Denominator", den_disp)
+        with c4: kpi_card("% Value", pct_disp)
+        with c5: kpi_card("Covered_Months", cov_disp)
     else:
         st.warning("No data for the selected provider under the current Metric/Region.")
-        c1, c2, c3, c4, c5 = st.columns(5)
-        for title in ["Rank","Numerator","Denominator","% Value","Covered_Months"]:
-            with (c1 if title=="Rank" else c2 if title=="Numerator" else c3 if title=="Denominator" else c4 if title=="% Value" else c5):
-                render_kpi_card(title, "---")
 
-# add 3px vertical space before the chart + metrics panel
+# small spacer before the chart + RHS panel
 st.markdown('<div class="vgap-3"></div>', unsafe_allow_html=True)
 
 # ===================== Chart (left) + RHS panel (right) =======
