@@ -457,17 +457,17 @@ def generate_summary(
         reg_sizeB = int(dataB["Region_Size"]) if pd.notna(dataB.get("Region_Size")) else None
         reg_rankB = int(dataB["Rank_Region"]) if pd.notna(dataB.get("Rank_Region")) else None
         
-        region_txt = f" within the <b>{region_selected}</b> region" if region_selected else " across all regions"
+        region_txt = f" within the <b>{html.escape(region_selected)}</b> region" if region_selected else " across all regions"
         
         p1 = (
-            f"<p>In <b>{period}</b>, <b>{nameA} ({provA})</b> achieved a <b>{fmt_pct(pctA, metric)}</b> "
-            f"performance rate for <b>{domain} → {metric}</b>{region_txt}, "
+            f"<p>In <b>{html.escape(period)}</b>, <b>{html.escape(nameA)} ({html.escape(provA)})</b> achieved a <b>{fmt_pct(pctA, metric)}</b> "
+            f"performance rate for <b>{html.escape(domain)} → {html.escape(metric)}</b>{region_txt}, "
             f"securing an overall national rank of <b>{rankA}</b> out of {nat_count} trusts"
         )
         if reg_rankA and reg_sizeA:
             p1 += f" and a regional rank of <b>{reg_rankA}</b> out of {reg_sizeA} trusts"
         
-        p1 += f". By comparison, <b>{nameB} ({provB})</b> recorded <b>{fmt_pct(pctB, metric)}</b>, "
+        p1 += f". By comparison, <b>{html.escape(nameB)} ({html.escape(provB)})</b> recorded <b>{fmt_pct(pctB, metric)}</b>, "
         p1 += f"ranking <b>{rankB}</b> nationally"
         
         if reg_rankB and reg_sizeB:
@@ -476,8 +476,7 @@ def generate_summary(
         if pd.notna(pctA) and pd.notna(pctB):
             gap = abs(pctB - pctA)
             leader = nameB if pctB > pctA else nameA
-            p1 += f". This represents a <b>{gap:.1f} percentage point</b> gap, with {leader} demonstrating stronger performance"
-        
+            p1 += f". This represents a <b>{gap:.1f} percentage point</b> gap, with {html.escape(leader)} demonstrating stronger performance"
         p1 += "."
         
         # Add weighted averages comparison
@@ -496,12 +495,12 @@ def generate_summary(
         nat_count = scope0["Provider_Code"].nunique()
         
         p1 = (
-            f"<p>In <b>{period}</b>, <b>{nameA} ({provA})</b> achieved a <b>{fmt_pct(pctA, metric)}</b> "
-            f"performance rate for <b>{domain} → {metric}</b>, ranking <b>{rankA}</b> out of {nat_count} trusts. "
+            f"<p>In <b>{html.escape(period)}</b>, <b>{html.escape(nameA)} ({html.escape(provA)})</b> achieved a <b>{fmt_pct(pctA, metric)}</b> "
+            f"performance rate for <b>{html.escape(domain)} → {html.escape(metric)}</b>, ranking <b>{rankA}</b> out of {nat_count} trusts. "
             f"<b>Provider B</b> has not been selected for comparison.</p>"
         )
     else:
-        p1 = f"<p>No provider data available for the selected filters in <b>{period}</b>.</p>"
+        p1 = f"<p>No provider data available for the selected filters in <b>{html.escape(period)}</b>.</p>"
     
     # Paragraph 2: Trend analysis
     period_col = "Month_dt" if mode == "Monthly" else "Quarter"
@@ -527,7 +526,7 @@ def generate_summary(
                 min_pct = pcts.min()
                 max_pct = pcts.max()
                 p2_parts.append(
-                    f"<b>{nameA} ({provA})</b> has shown performance ranging from "
+                    f"<b>{html.escape(nameA)} ({html.escape(provA)})</b> has shown performance ranging from "
                     f"<b>{fmt_pct(min_pct, metric)}</b> to <b>{fmt_pct(max_pct, metric)}</b> over the preceding {lookback} {period_label}"
                 )
     
@@ -539,7 +538,7 @@ def generate_summary(
                 min_pct = pcts.min()
                 max_pct = pcts.max()
                 p2_parts.append(
-                    f"<b>{nameB} ({provB})</b> has demonstrated performance between "
+                    f"<b>{html.escape(nameB)} ({html.escape(provB)})</b> has demonstrated performance between "
                     f"<b>{fmt_pct(min_pct, metric)}</b> and <b>{fmt_pct(max_pct, metric)}</b> over the same period"
                 )
     

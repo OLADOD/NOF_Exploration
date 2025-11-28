@@ -524,8 +524,8 @@ def make_summary_html(df: pd.DataFrame,
 
         # Build narrative paragraphs
         p1 = (
-            f"<p><b>{prov_name}</b> achieved a <b>{pct_disp}</b> performance rate for "
-            f"<b>{domain} → {metric}</b> in <b>{quarter}</b> across the <b>{provider_region}</b> region. "
+            f"<p><b>{html.escape(prov_name)}</b> achieved a <b>{pct_disp}</b> performance rate for "
+            f"<b>{html.escape(domain)} → {html.escape(metric)}</b> in <b>{html.escape(quarter)}</b> across the <b>{html.escape(provider_region)}</b> region. "
             f"This placed them <b>{rank_val}{'th' if rank_val else ''} nationally</b> out of {nat_n} trusts"
         )
         
@@ -603,8 +603,8 @@ def make_summary_html(df: pd.DataFrame,
                     change_txt = f" Regional performance {direction} by {abs(dpp):.1f} percentage points compared to {prev_q}."
 
         p1 = (
-            f"<p>The <b>{region_selected}</b> region achieved a weighted average performance of "
-            f"<b>{reg_pct_disp}</b> for <b>{domain} → {metric}</b> in <b>{quarter}</b>. "
+            f"<p>The <b>{html.escape(region_selected)}</b> region achieved a weighted average performance of "
+            f"<b>{reg_pct_disp}</b> for <b>{html.escape(domain)} → {html.escape(metric)}</b> in <b>{html.escape(quarter)}</b>. "
             f"This regional view includes <b>{reg_n} trusts</b> out of <b>{nat_n}</b> trusts nationally."
             f"{comparison_txt}{change_txt}</p>"
         )
@@ -952,8 +952,8 @@ st.markdown(
 
 # ===================== Context banner ======================
 context_html = (
-    f'Showing <b>{domain}</b> → <b>{metric}</b> in <b>{quarter}</b>'
-    + (f' for <b>{region_selected}</b> region' if region_selected else ' across <b>all regions</b>')
+    f'Showing <b>{html.escape(domain)}</b> → <b>{html.escape(metric)}</b> in <b>{html.escape(quarter)}</b>'
+    + (f' for <b>{html.escape(region_selected)}</b> region' if region_selected else ' across <b>all regions</b>')
     + '.'
 )
 st.markdown(f'<div id="context-banner">{context_html}</div>', unsafe_allow_html=True)
@@ -961,7 +961,7 @@ st.markdown(f'<div id="context-banner">{context_html}</div>', unsafe_allow_html=
 # ===================== Provider heading ====================
 if provider_code:
     prov_name = provider_name_from_code(df_qdmr, provider_code)
-    st.markdown(f"<h2 class='kpi-heading'>{prov_name} ({provider_code})</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 class='kpi-heading'>{html.escape(prov_name)} ({html.escape(provider_code)})</h2>", unsafe_allow_html=True)
 else:
     st.info("Select a provider to see KPIs and trend.")
 

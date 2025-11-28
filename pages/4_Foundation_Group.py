@@ -635,9 +635,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-ctx_bits = [f"{domain}", f"{metric}", f"{period}"]
+ctx_bits = [f"{html.escape(domain)}", f"{html.escape(metric)}", f"{html.escape(period)}"]
 if region != "(All Regions)":
-    ctx_bits.append(f"{region}")
+    ctx_bits.append(f"{html.escape(region)}")
 st.markdown(
     f"<div id='context-banner'>Viewing <b>{' → '.join(ctx_bits)}</b>.</div>",
     unsafe_allow_html=True,

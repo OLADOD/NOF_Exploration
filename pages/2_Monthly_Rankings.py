@@ -17,7 +17,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 import streamlit as st
-import html as _html
+import html
 from pathlib import Path
 
 # add (or keep) this import in the file header
@@ -521,8 +521,8 @@ st.markdown(
 
 # ===================== Context banner ======================
 context_html = (
-    f'Showing <b>{domain}</b> → <b>{metric}</b> in <b>{month_long}</b>'
-    + (f' for <b>{region_selected}</b> region' if region_selected else ' across <b>all regions</b>')
+    f'Showing <b>{html.escape(domain)}</b> → <b>{html.escape(metric)}</b> in <b>{html.escape(month_long)}</b>'
+    + (f' for <b>{html.escape(region_selected)}</b> region' if region_selected else ' across <b>all regions</b>')
     + '.'
 )
 st.markdown(f'<div id="context-banner">{context_html}</div>', unsafe_allow_html=True)
@@ -530,7 +530,7 @@ st.markdown(f'<div id="context-banner">{context_html}</div>', unsafe_allow_html=
 # ===================== Provider heading ====================
 if provider_code:
     prov_name = provider_name_from_code(df_mdmr, provider_code)  # Month+Domain+Metric(+Region)
-    st.markdown(f"<h2 class='kpi-heading'>{prov_name} ({provider_code})</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 class='kpi-heading'>{html.escape(prov_name)} ({html.escape(provider_code)})</h2>", unsafe_allow_html=True)
 else:
     st.info("Select a provider to see KPIs and trend.")
 
@@ -861,13 +861,13 @@ with right:
             card_html = (
                 f'<div class="progress-card">'
                 f'  <div class="progress-head">'
-                f'    <div class="progress-name">{_html.escape(str(m))}</div>'
+                f'    <div class="progress-name">{html.escape(str(m))}</div>'
                 f'    <div class="progress-percent">{pct_txt}</div>'
                 f'  </div>'
                 f'  <div class="progress-track"><div class="progress-fill" style="width:{width:.2f}%;"></div></div>'
                 f'  <div class="progress-caption">'
                 f'    <span>{nat_label}</span>'
-                f'    <span class="muted">{_html.escape(reg_label)}</span>'
+                f'    <span class="muted">{html.escape(reg_label)}</span>'
                 f'  </div>'
                 f'</div>'
             )
